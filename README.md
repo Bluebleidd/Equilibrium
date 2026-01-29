@@ -1,46 +1,37 @@
-# Equilibrium Load Balancer
+# ⚖️ Equilibrium Load Balancer
 
-![Go](https://img.shields.io/badge/Go-1.21-00ADD8?logo=go&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-success)
+![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
-**Equilibrium** to lekki, wydajny Load Balancer warstwy 7 (HTTP) napisany w języku Go. Projekt demonstruje działanie systemów rozproszonych, w tym mechanizmy Reverse Proxy, algorytm Round-Robin oraz aktywne sprawdzanie stanu serwerów (Health Checks).
+**Equilibrium** is a lightweight, concurrent Layer 7 (HTTP) Load Balancer built from scratch in Go. It demonstrates core distributed systems concepts including Reverse Proxying, Round-Robin scheduling, and Active Health Checks.
 
-Całość działa w kontenerach Docker i posiada wbudowany **graficzny panel w terminalu (Dashboard)** do monitorowania ruchu na żywo.
-
----
-
-## Do czego to służy? (Zastosowania)
-
-Ten projekt jest gotowym szkieletem infrastruktury, który możesz wykorzystać do:
-
-1.  **Zwiększenia stabilności aplikacji (High Availability):** Jeśli jeden serwer padnie, Equilibrium automatycznie przekieruje ruch do pozostałych.
-2.  **Aktualizacji bez przestojów (Zero-Downtime Deployment):** Możesz aktualizować backendy pojedynczo, a użytkownicy nie zauważą przerwy w działaniu.
-3.  **Skalowania ruchu:** Pozwala obsłużyć więcej użytkowników poprzez rozłożenie zapytań na wiele instancji tej samej aplikacji.
-4.  **Testowania odporności (Chaos Engineering):** Idealne środowisko do nauki – możesz celowo wyłączać kontenery i obserwować, jak system radzi sobie z awariami.
+The project runs entirely in Docker and features a built-in **Real-time Terminal Dashboard (TUI)** to monitor traffic distribution and server health instantly.
 
 ---
 
-## Wymagania Lokalne
+## 🚀 Use Cases
 
-Dzięki konteneryzacji, nie musisz instalować języka Go ani zależności na swoim komputerze.
-
-* **Wymagane:** Zainstalowany [Docker Desktop](https://www.docker.com/products/docker-desktop).
-* **Opcjonalnie:** Git (do sklonowania repozytorium).
+This project serves as a production-ready infrastructure skeleton for:
+1.  **High Availability:** Automatically routes traffic away from crashed servers.
+2.  **Zero-Downtime Deployments:** Allows updating backend services one by one without disrupting users.
+3.  **Horizontal Scaling:** Distributes heavy traffic load across multiple application instances.
+4.  **Chaos Engineering:** Perfect for testing how your system behaves when components fail.
 
 ---
 
-## Konfiguracja
+## 🛠️ Architecture
 
-Główna konfiguracja znajduje się w pliku `config.json`. Możesz tam zmienić porty lub dodać więcej serwerów.
+```mermaid
+graph LR
+    Client(User / Browser) -->|HTTP :8000| LB{Equilibrium LB}
+    
+    subgraph "Docker Network"
+        LB -->|Round Robin| App1(Backend 1)
+        LB -->|Round Robin| App2(Backend 2)
+        LB -->|Round Robin| App3(Backend 3)
+    end
 
-```json
-{
-  "port": ":8000",           // Port, na którym nasłuchuje Load Balancer
-  "health_check_interval": "5s", // Jak często sprawdzać czy serwery żyją
-  "backends": [              // Lista adresów Twoich aplikacji
-    "http://backend1:8081",
-    "http://backend2:8081",
-    "http://backend3:8081"
-  ]
-}
+    LB -.->|Health Check Loop| App1
+    LB -.->|Health Check Loop| App2
+    LB -.->|Health Check Loop| App3
