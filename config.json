@@ -1,0 +1,9 @@
+{
+  "port": ":8000",
+  "backends": [
+    "http://backend1:8081",
+    "http://backend2:8081",
+    "http://backend3:8081"
+  ],
+  "health_check_interval": "10s"
+}

@@ -1,0 +1,38 @@
+services:
+  loadbalancer:
+    build: . 
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend1 
+      - backend2
+      - backend3
+    networks:
+      - lb-net
+    tty: true
+    stdin_open: true
+
+  backend1:
+    build: ./test-app
+    environment:
+      - APP_COLOR=BLUE
+    networks:
+      - lb-net
+
+  backend2:
+    build: ./test-app
+    environment:
+      - APP_COLOR=RED
+    networks:
+      - lb-net
+
+  backend3:
+    build: ./test-app
+    environment:
+      - APP_COLOR=GREEN
+    networks:
+      - lb-net
+
+networks:
+  lb-net:
+    driver: bridge

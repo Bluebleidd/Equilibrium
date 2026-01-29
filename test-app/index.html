@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Equilibrium Demo</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background-color: #f0f2f5; 
+        }
+        .card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            text-align: center; 
+            border-top: 10px solid var(--card-color); 
+        }
+        h1 { margin-bottom: 10px; color: #333; }
+        .id { 
+            font-size: 1.2em; 
+            color: #666; 
+            font-family: monospace; 
+            background: #eee; 
+            padding: 5px 10px; 
+            border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="card" style="--card-color: {{.Color}};">
+        <h1>Witaj w Chmurze! ☁️</h1>
+        <p>Twoje żądanie zostało obsłużone przez instancję:</p>
+        <p class="id">{{.Hostname}}</p>
+    </div>
+</body>
+</html>
