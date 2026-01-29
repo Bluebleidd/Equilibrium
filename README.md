@@ -2,7 +2,6 @@
 
 ![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
 **Equilibrium** is a lightweight, concurrent Layer 7 (HTTP) Load Balancer built from scratch in Go. It demonstrates core distributed systems concepts including Reverse Proxying, Round-Robin scheduling, and Active Health Checks.
 
