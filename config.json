@@ -1,5 +1,6 @@
 {
   "port": ":8000",
+  "strategy": "least_conn",
   "backends": [
     "http://backend1:8081",
     "http://backend2:8081",

@@ -13,7 +13,8 @@ import (
 func main() {
 	cfg := config.LoadConfig("config.json")
 
-	serverPool := proxy.NewServerPool()
+	serverPool := proxy.NewServerPool(cfg.Strategy)
+
 	for _, backendUrl := range cfg.Backends {
 		serverPool.AddBackend(backendUrl)
 	}
@@ -23,7 +24,8 @@ func main() {
 	server := http.Server{
 		Addr: cfg.Port,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			peer := serverPool.GetNextPeer()
+			peer := serverPool.GetNextPeer(r)
+
 			if peer != nil {
 				peer.ReverseProxy.ServeHTTP(w, r)
 			} else {
@@ -34,7 +36,7 @@ func main() {
 
 	log.SetOutput(os.Stderr)
 
-	go ui.StartDashboard(serverPool, cfg.Port)
+	go ui.StartDashboard(serverPool, cfg.Port, cfg.Strategy)
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)

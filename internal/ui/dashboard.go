@@ -4,6 +4,7 @@ import (
 	"equilibrium/internal/proxy"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 )
@@ -14,25 +15,26 @@ const (
 	ColorGreen  = "\033[32m"
 	ColorYellow = "\033[33m"
 	ColorCyan   = "\033[36m"
-	ColorWhite  = "\033[37m"
 
 	ClearScreen = "\033[2J"
 	MoveTopLeft = "\033[H"
 )
 
-func Render(pool *proxy.ServerPool, port string) {
+func Render(pool *proxy.ServerPool, port string, strategy string) {
 	fmt.Print(ClearScreen + MoveTopLeft)
 
-	line := "============================================="
+	line := "====================================================="
 
 	fmt.Println(ColorCyan + line + ColorReset)
 	fmt.Printf("   EQUILIBRIUM LOAD BALANCER (Port: %s)   \n", port)
+	fmt.Printf("   STRATEGY: %s \n", strings.ToUpper(strategy))
 	fmt.Println(ColorCyan + line + ColorReset)
 	fmt.Println("")
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-	fmt.Fprintln(w, "SERVER\tSTATUS      REQUESTS")
-	fmt.Fprintln(w, "------\t------      --------")
+
+	fmt.Fprintln(w, "SERVER\tSTATUS\tACTIVE\tTOTAL REQ")
+	fmt.Fprintln(w, "------\t------\t------\t---------")
 
 	for _, b := range pool.GetBackends() {
 		statusText := "DOWN"
@@ -42,25 +44,24 @@ func Render(pool *proxy.ServerPool, port string) {
 			statusText = "UP"
 			color = ColorGreen
 		}
-		paddedStatus := fmt.Sprintf("%-12s", statusText)
 
-		row := fmt.Sprintf("%s\t%s%s%s%d",
+		fmt.Fprintf(w, "%s\t%s%s%s\t%d\t%d\n",
 			b.URL,
-			color, paddedStatus, ColorReset,
+			color, statusText, ColorReset,
+			b.GetActiveConnections(),
 			b.GetRequests(),
 		)
-
-		fmt.Fprintln(w, row)
 	}
 
 	w.Flush()
 
 	fmt.Println("\n" + ColorCyan + line + ColorReset)
+	fmt.Println("[Ctrl+C] Stop System | [Ctrl+P, Ctrl+Q] Detach")
 }
 
-func StartDashboard(pool *proxy.ServerPool, port string) {
+func StartDashboard(pool *proxy.ServerPool, port string, strategy string) {
 	for {
-		Render(pool, port)
+		Render(pool, port, strategy)
 		time.Sleep(500 * time.Millisecond)
 	}
 }
