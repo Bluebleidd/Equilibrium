@@ -13,6 +13,7 @@ type Backend struct {
 	Alive        bool
 	mux          sync.RWMutex
 	Requests     uint64
+	ActiveConns  int64
 }
 
 func (b *Backend) SetAlive(alive bool) {
@@ -33,4 +34,16 @@ func (b *Backend) GetRequests() uint64 {
 
 func (b *Backend) IncrementRequests() {
 	atomic.AddUint64(&b.Requests, 1)
+}
+
+func (b *Backend) GetActiveConnections() int64 {
+	return atomic.LoadInt64(&b.ActiveConns)
+}
+
+func (b *Backend) IncrementActiveConns() {
+	atomic.AddInt64(&b.ActiveConns, 1)
+}
+
+func (b *Backend) DecrementActiveConns() {
+	atomic.AddInt64(&b.ActiveConns, -1)
 }

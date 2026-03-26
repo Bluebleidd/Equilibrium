@@ -5,16 +5,29 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"sync/atomic"
 )
 
 type ServerPool struct {
 	backends []*Backend
-	current  uint64
+	Strategy BalancingStrategy
 }
 
-func NewServerPool() *ServerPool {
-	return &ServerPool{}
+func NewServerPool(strategyName string) *ServerPool {
+	pool := &ServerPool{}
+
+	switch strategyName {
+	case "least_conn":
+		pool.Strategy = &LeastConnStrategy{}
+		log.Println("Używana strategia: Least Connections")
+	case "ip_hash":
+		pool.Strategy = &IPHashStrategy{}
+		log.Println("Używana strategia: IP Hash")
+	default:
+		pool.Strategy = &RoundRobinStrategy{}
+		log.Println("Używana strategia: Round Robin (Domyślna)")
+	}
+
+	return pool
 }
 
 func (s *ServerPool) AddBackend(serverUrl string) {
@@ -24,37 +37,46 @@ func (s *ServerPool) AddBackend(serverUrl string) {
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(u)
+
+	backend := &Backend{
+		URL:          u,
+		ReverseProxy: proxy,
+		Alive:        true,
+	}
+
+	originalDirector := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		originalDirector(req)
+	}
+
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		backend.DecrementActiveConns()
+		return nil
+	}
+
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, e error) {
 		log.Printf("[%s] %s\n", u.Host, e.Error())
+		backend.DecrementActiveConns()
 		w.WriteHeader(http.StatusServiceUnavailable)
 		w.Write([]byte("Service Unavailable"))
 	}
 
-	s.backends = append(s.backends, &Backend{
-		URL:          u,
-		ReverseProxy: proxy,
-		Alive:        true,
-	})
+	s.backends = append(s.backends, backend)
 }
 
-func (s *ServerPool) GetNextPeer() *Backend {
-	next := s.current
-	l := uint64(len(s.backends))
-
-	for i := uint64(0); i < l; i++ {
-		next = atomic.AddUint64(&s.current, 1)
-		idx := next % l
-
-		if s.backends[idx].IsAlive() {
-			if i != 0 {
-				atomic.StoreUint64(&s.current, next)
-			}
-			s.backends[idx].IncrementRequests()
-			return s.backends[idx]
-		}
+func (s *ServerPool) GetNextPeer(r *http.Request) *Backend {
+	if s.Strategy == nil {
+		return nil
 	}
-	return nil
+
+	backend := s.Strategy.NextBackend(s.backends, r)
+	if backend != nil {
+		backend.IncrementRequests()
+		backend.IncrementActiveConns()
+	}
+	return backend
 }
+
 func (s *ServerPool) GetBackends() []*Backend {
 	return s.backends
 }
