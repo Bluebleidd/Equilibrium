@@ -2,10 +2,13 @@
 
 **Equilibrium** is a high-performance Layer 7 (HTTP) Load Balancer engineered in Go. It acts as a reverse proxy that distributes incoming network traffic across multiple backend servers to ensure efficiency and reliability.
 
-The system is fully containerized using Docker and features a **Real-time Terminal Dashboard (TUI)**. This dashboard provides instant visibility into traffic throughput and server health statuses without the need for complex logging setups. Core capabilities include:
-* **Round-Robin Scheduling:** Evenly distributes requests across healthy instances.
+The system is fully containerized using Docker and features a **Real-time Terminal Dashboard (TUI)**. This dashboard provides instant visibility into traffic throughput, active connections, and server health statuses without the need for complex logging setups. 
+
+Core capabilities include:
+* **Advanced Routing Strategies:** Supports multiple load balancing algorithms, including `round_robin`, `least_conn` (Least Connections), and `ip_hash` (Session Persistence).
 * **Active Health Checks:** Periodically pings backends and automatically removes unresponsive servers from the rotation.
 * **Fault Tolerance:** Prevents HTTP 500 errors by routing traffic only to "UP" servers.
+* **Seamless Developer Experience (DX):** Supports hot-reloading for backend applications via Docker Volumes and `.env` configuration.
 
 ## Use Cases
 Equilibrium is designed as a foundational infrastructure component suitable for various scenarios:
@@ -25,18 +28,19 @@ To run this project, you do not need to install Go or manual dependencies. The e
 *No local installation of Golang is required.*
 
 ## Configuration & Custom Integration
-This section explains how to configure the load balancer and integrate your own custom application (e.g., Python, Node.js, Java) instead of the default test application.
+Equilibrium is built to route traffic to any type of web application (Node.js, Python, Java, Go, etc.). This section explains how to configure the load balancer and integrate your own custom project instead of the default test application.
 
-## Core Configuration (`config.json`)
-The `config.json` file in the root directory controls the load balancer's behavior.
+### 1. Core Configuration (`config.json`)
+The `config.json` file in the root directory controls the load balancer's behavior. By standard convention, Equilibrium routes traffic to internal port `8080` on all backend containers.
 
 ```json
 {
   "port": ":8000",
+  "strategy": "least_conn",
   "backends": [
-    "http://backend1:8081",
-    "http://backend2:8081",
-    "http://backend3:8081"
+    "http://backend1:8080",
+    "http://backend2:8080",
+    "http://backend3:8080"
   ],
   "health_check_interval": "5s"
 }
