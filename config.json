@@ -2,9 +2,9 @@
   "port": ":8000",
   "strategy": "least_conn",
   "backends": [
-    "http://backend1:8081",
-    "http://backend2:8081",
-    "http://backend3:8081"
+    "http://backend1:8080",
+    "http://backend2:8080",
+    "http://backend3:8080"
   ],
-  "health_check_interval": "10s"
+  "health_check_interval": "5s"
 }

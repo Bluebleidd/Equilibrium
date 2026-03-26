@@ -1,6 +1,6 @@
 services:
   loadbalancer:
-    build: . 
+    build: .
     ports:
       - "8000:8000"
     depends_on:
@@ -13,23 +13,32 @@ services:
     stdin_open: true
 
   backend1:
-    build: ./test-app
+    build: ${APP_PATH}
     environment:
-      - APP_COLOR=BLUE
+      - APP_COLOR=#3498db
+    volumes:
+      - ${APP_PATH}:/app
+      - /app/node_modules
     networks:
       - lb-net
 
   backend2:
-    build: ./test-app
+    build: ${APP_PATH}
     environment:
-      - APP_COLOR=RED
+      - APP_COLOR=#e74c3c
+    volumes:
+      - ${APP_PATH}:/app
+      - /app/node_modules
     networks:
       - lb-net
 
   backend3:
-    build: ./test-app
+    build: ${APP_PATH}
     environment:
-      - APP_COLOR=GREEN
+      - APP_COLOR=#2ecc71
+    volumes:
+      - ${APP_PATH}:/app
+      - /app/node_modules
     networks:
       - lb-net
 

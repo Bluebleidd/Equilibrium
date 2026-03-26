@@ -1,6 +1,6 @@
 FROM golang:1.21-alpine
 WORKDIR /app
-COPY main.go .
-COPY index.html .
-RUN go build -o app main.go
-CMD ["./app"]
+COPY . .
+RUN go build -o /server main.go
+EXPOSE 8080
+CMD ["/server"]

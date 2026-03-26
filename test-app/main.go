@@ -31,6 +31,6 @@ func main() {
 		t.Execute(w, PageData{Hostname: hostname, Color: color})
 	})
 
-	log.Println("Aplikacja testowa startuje na porcie 8081...")
-	http.ListenAndServe(":8081", nil)
+	log.Println("Aplikacja testowa startuje na porcie 8080...")
+	http.ListenAndServe(":8080", nil)
 }
