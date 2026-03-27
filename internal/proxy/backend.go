@@ -34,6 +34,7 @@ func (b *Backend) GetRequests() uint64 {
 
 func (b *Backend) IncrementRequests() {
 	atomic.AddUint64(&b.Requests, 1)
+	TotalRequests.Add(1)
 }
 
 func (b *Backend) GetActiveConnections() int64 {
@@ -42,8 +43,10 @@ func (b *Backend) GetActiveConnections() int64 {
 
 func (b *Backend) IncrementActiveConns() {
 	atomic.AddInt64(&b.ActiveConns, 1)
+	ActiveConnections.Add(1)
 }
 
 func (b *Backend) DecrementActiveConns() {
 	atomic.AddInt64(&b.ActiveConns, -1)
+	ActiveConnections.Add(-1)
 }

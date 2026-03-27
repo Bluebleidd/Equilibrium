@@ -3,6 +3,7 @@ services:
     build: .
     ports:
       - "8000:8000"
+      - "2112:2112"
     depends_on:
       - backend1 
       - backend2
