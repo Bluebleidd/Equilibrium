@@ -30,7 +30,7 @@ To run this project, you do not need to install Go or manual dependencies. The e
 ## Configuration & Custom Integration
 Equilibrium is built to route traffic to any type of web application (Node.js, Python, Java, Go, etc.). This section explains how to configure the load balancer and integrate your own custom project instead of the default test application.
 
-### 1. Core Configuration (`config.json`)
+### Core Configuration (`config.json`)
 The `config.json` file in the root directory controls the load balancer's behavior. By standard convention, Equilibrium routes traffic to internal port `8080` on all backend containers.
 
 ```json
@@ -44,3 +44,15 @@ The `config.json` file in the root directory controls the load balancer's behavi
   ],
   "health_check_interval": "5s"
 }
+```
+
+## Monitoring & Telemetry (Hacker Dashboard)
+Equilibrium favors a minimalist, high-performance approach to observability. It exposes real-time, zero-overhead metrics in JSON format at `http://localhost:2112/debug/vars`.
+
+For a real-time, matrix-style terminal visualization, you can use the lightweight `expvarmon` tool:
+
+### Install expvarmon (requires local Go installation)
+go install github.com/divan/expvarmon@latest
+
+### Run the terminal dashboard
+expvarmon -ports="2112" -vars="equilibrium_requests_total,equilibrium_active_connections,mem:memstats.Alloc"
