@@ -8,9 +8,16 @@ import (
 	"equilibrium/internal/config"
 	"equilibrium/internal/proxy"
 	"equilibrium/internal/ui"
+	_ "expvar"
 )
 
 func main() {
+
+	go func() {
+		log.Println("Metryki expvar dostępne pod adresem: http://localhost:2112/debug/vars")
+		http.ListenAndServe(":2112", nil)
+	}()
+
 	cfg := config.LoadConfig("config.json")
 
 	serverPool := proxy.NewServerPool(cfg.Strategy)
